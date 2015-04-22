@@ -17,7 +17,6 @@ func main() {
 	flag.Parse()
 
 	config := aws.DefaultConfig
-	config.LogLevel = 4
 
 	s3Svc = s3.New(config)
 
