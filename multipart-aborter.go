@@ -16,9 +16,14 @@ func main() {
 	spBucket := flag.String("bucket", "", "Enter bucket to clear in-progress multipart uploads.")
 	flag.Parse()
 
-	s3Svc = s3.New(aws.DefaultConfig)
+	config := aws.DefaultConfig
+	config.LogLevel = 4
+
+	s3Svc = s3.New(config)
 
 	resp := mustListMultipartUploads(spBucket)
+
+	fmt.Println(awsutil.StringValue(resp))
 
 	for _, upload := range resp.Uploads {
 		mustAbort(spBucket, upload)
@@ -29,7 +34,7 @@ func main() {
 func mustListMultipartUploads(spBucket *string) *s3.ListMultipartUploadsOutput {
 	params := &s3.ListMultipartUploadsInput{
 		Bucket:     spBucket,
-		Delimiter:  aws.String("/"),
+		Delimiter:  aws.String(""),
 		MaxUploads: aws.Long(1000),
 		Prefix:     aws.String(""),
 	}
@@ -40,8 +45,6 @@ func mustListMultipartUploads(spBucket *string) *s3.ListMultipartUploadsOutput {
 	} else if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(awsutil.StringValue(resp))
 
 	return resp
 }
